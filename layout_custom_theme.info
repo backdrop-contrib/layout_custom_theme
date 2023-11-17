@@ -1,0 +1,9 @@
+name = Layout Custom Theme
+description = Enables admins to select a custom theme to be used for any layout.
+backdrop = 1.x
+type = module
+
+package = Layouts
+tags[] = Theme Enhancements
+tags[] = Appearance
+tags[] = System Horizons

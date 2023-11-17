@@ -1,0 +1,113 @@
+<?php
+/**
+ * @file
+ * Main file for Layout Custom Theme module.
+ */
+
+/**
+ * Implements hook_config_info().
+ */
+function layout_custom_theme_config_info() {
+  $prefixes['layout_custom_theme.settings'] = array(
+    'label' => t('Layout Custom Theme settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for layout_settings_form.
+ */
+function layout_custom_theme_form_layout_settings_form_alter(&$form, &$form_state, $form_id) {
+  // Get the name of the layout being modified.
+  $layout_name = $form['name']['#default_value'];
+
+  // Attempt to get the config for this layout.
+  $config = config_get('layout_custom_theme.settings', $layout_name);
+
+  // Define the form elements.
+  $form['custom_theme'] = array(
+    '#title' => t('Custom Theme'),
+    '#type' => 'item',
+  );
+  $form['custom_theme_enable'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use custom theme on this layout.'),
+    '#default_value' => (is_null($config)) ? FALSE : TRUE,
+  );
+
+  // Get the options for the themes.
+  $options = layout_custom_theme_get_themes();
+
+  $form['custom_theme_theme'] = array(
+    '#type' => 'select',
+    '#title' => 'Custom theme',
+    '#options' => $options,
+    '#empty_option' => '- Select theme -',
+    '#default_value' => (is_null($config)) ? '' : $config,
+    '#states' => array(
+      'visible' => array(':input[name="custom_theme_enable"]' => array('checked' => TRUE)),
+      'required' => array(':input[name="custom_theme_enable"]' => array('checked' => TRUE)),
+    ),
+  );
+  $form['actions']['submit']['#submit'][] = 'layout_custom_theme_form_layout_settings_form_alter_submit';
+}
+
+/**
+ * Helper function to get custom theme options.
+ *
+ * @return array
+ *   An array of all enabled, non-hidden themes with machine name and label.
+ */
+function layout_custom_theme_get_themes() {
+  // Get current list of themes.
+  $themes = system_rebuild_theme_data();
+  // Define array to collect options.
+  $custom_theme_options = array();
+  // Loop through all themes.
+  foreach ($themes as $theme) {
+    // Check if enabled and not hidden.
+    if ($theme->status && empty($theme->info['hidden'])) {
+      // Add to array using machine name as key and label as value.
+      $custom_theme_options[$theme->name] = $theme->info['name'];
+    }
+  }
+  return $custom_theme_options;
+}
+
+/**
+ * Save the settings.
+ */
+function layout_custom_theme_form_layout_settings_form_alter_submit($form, &$form_state) {
+  // Get the name of the layout being modified.
+  $layout_name = $form['name']['#default_value'];
+
+  // Define the config file.
+  $config_name = 'layout_custom_theme.settings';
+
+  // Check if custom theme is enabled on the form.
+  if ($form_state['values']['custom_theme_enable']) {
+    // If so, set a config item for this layout with the value of this theme.
+    config_set($config_name, $layout_name, $form_state['values']['custom_theme_theme']);
+  }
+  else {
+    // If not, delete the config item if it exists.
+    config_clear($config_name, $layout_name);
+  }
+}
+
+/**
+ * Implements hook_custom_theme().
+ */
+function layout_custom_theme_custom_theme() {
+  // Get the current item.
+  $item = menu_get_item();
+  // Get the layout in use by the current item.
+  $layout = layout_get_layout_by_path(NULL, $item);
+  // Attempt to retrieve a custom theme settings for this layout.
+  $theme = config_get('layout_custom_theme.settings', $layout->name);
+  // If a setting is returned, define this as the custom theme.
+  if ($theme) {
+    return $theme;
+  }
+}
