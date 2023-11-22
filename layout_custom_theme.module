@@ -19,36 +19,39 @@ function layout_custom_theme_config_info() {
  * Implements hook_form_FORM_ID_alter() for layout_settings_form.
  */
 function layout_custom_theme_form_layout_settings_form_alter(&$form, &$form_state, $form_id) {
-  // Get the name of the layout being modified.
-  $layout_name = $form['name']['#default_value'];
+  // Get the layout object being modified.
+  $layout = $form_state['layout'];
 
-  // Attempt to get the config for this layout.
-  $config = config_get('layout_custom_theme.settings', $layout_name);
+  // Get the config item if it exists.
+  $config = config_get('layout_custom_theme.settings', $layout->name);
 
   // Define the form elements.
   $form['custom_theme'] = array(
     '#title' => t('Custom Theme'),
     '#type' => 'item',
+    '#access' => !$layout->isDefault(),
   );
-  $form['custom_theme_enable'] = array(
+  $form['custom_theme']['enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use custom theme on this layout.'),
     '#default_value' => (is_null($config)) ? FALSE : TRUE,
+    '#access' => !$layout->isDefault(),
   );
 
   // Get the options for the themes.
   $options = layout_custom_theme_get_themes();
 
-  $form['custom_theme_theme'] = array(
+  $form['custom_theme']['theme'] = array(
     '#type' => 'select',
     '#title' => 'Custom theme',
     '#options' => $options,
     '#empty_option' => '- Select theme -',
     '#default_value' => (is_null($config)) ? '' : $config,
     '#states' => array(
-      'visible' => array(':input[name="custom_theme_enable"]' => array('checked' => TRUE)),
-      'required' => array(':input[name="custom_theme_enable"]' => array('checked' => TRUE)),
+      'visible' => array(':input[name="custom_theme[enable]"]' => array('checked' => TRUE)),
+      'required' => array(':input[name="custom_theme[enable]"]' => array('checked' => TRUE)),
     ),
+    '#access' => !$layout->isDefault(),
   );
   $form['actions']['submit']['#submit'][] = 'layout_custom_theme_form_layout_settings_form_alter_submit';
 }
@@ -79,20 +82,20 @@ function layout_custom_theme_get_themes() {
  * Save the settings.
  */
 function layout_custom_theme_form_layout_settings_form_alter_submit($form, &$form_state) {
-  // Get the name of the layout being modified.
-  $layout_name = $form['name']['#default_value'];
+  // Get the layout object being modified.
+  $layout = $form_state['layout'];
 
   // Define the config file.
   $config_name = 'layout_custom_theme.settings';
 
   // Check if custom theme is enabled on the form.
-  if ($form_state['values']['custom_theme_enable']) {
+  if ($form_state['values']['custom_theme']['enable']) {
     // If so, set a config item for this layout with the value of this theme.
-    config_set($config_name, $layout_name, $form_state['values']['custom_theme_theme']);
+    config_set($config_name, $layout->name, $form_state['values']['custom_theme']['theme']);
   }
   else {
     // If not, delete the config item if it exists.
-    config_clear($config_name, $layout_name);
+    config_clear($config_name, $layout->name);
   }
 }
 
