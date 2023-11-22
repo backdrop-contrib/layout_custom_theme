@@ -15,7 +15,7 @@ page; for example: https://github.com/backdrop-contrib/setup/wiki/Documentation.
 -->
 
 Layout Custom Theme enables admins to select a custom theme to be used for any
-layout.
+layout that is not a default layout.
 
 Installation
 ------------
