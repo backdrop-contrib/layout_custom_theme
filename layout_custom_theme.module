@@ -105,12 +105,16 @@ function layout_custom_theme_form_layout_settings_form_alter_submit($form, &$for
 function layout_custom_theme_custom_theme() {
   // Get the current item.
   $item = menu_get_item();
-  // Get the layout in use by the current item.
-  $layout = layout_get_layout_by_path(NULL, $item);
-  // Attempt to retrieve a custom theme settings for this layout.
-  $theme = config_get('layout_custom_theme.settings', $layout->name);
-  // If a setting is returned, define this as the custom theme.
-  if ($theme) {
-    return $theme;
+
+  // Check that an item has been returned.
+  if ($item) {
+    // Get the layout in use by the current item.
+    $layout = layout_get_layout_by_path(NULL, $item);
+    // Attempt to retrieve a custom theme settings for this layout.
+    $theme = config_get('layout_custom_theme.settings', $layout->name);
+    // If a setting is returned, define this as the custom theme.
+    if ($theme) {
+      return $theme;
+    }
   }
 }
