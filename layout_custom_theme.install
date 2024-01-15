@@ -1,0 +1,25 @@
+<?php
+/**
+ * @file
+ * Update hook and uninstaller for the Layout Custom Theme module
+ */
+
+/**
+ * Implements hook_install().
+ */
+function layout_custom_theme_install() {
+  // Set our weight so that we execute last, to avoid other modules
+  // setting a custom theme later.
+  module_set_weight('layout_custom_theme', 99);
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Set module weight higher so it can override other module custom themes.
+ */
+function layout_custom_theme_update_1001() {
+  // Set our weight so that we execute last, to avoid other modules
+  // setting a custom theme later.
+  module_set_weight('layout_custom_theme', 99);
+}
