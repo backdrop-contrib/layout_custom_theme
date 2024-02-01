@@ -106,8 +106,8 @@ function layout_custom_theme_custom_theme() {
   // Get the current item.
   $item = menu_get_item();
 
-  // Check that an item has been returned.
-  if ($item) {
+  // Check that an item has been returned and that user has access to it.
+  if ($item && $item['access']) {
     // Get the layout in use by the current item.
     $layout = layout_get_layout_by_path(NULL, $item);
     // Attempt to retrieve a custom theme settings for this layout.
