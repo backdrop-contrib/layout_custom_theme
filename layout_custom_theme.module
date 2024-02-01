@@ -34,7 +34,7 @@ function layout_custom_theme_form_layout_settings_form_alter(&$form, &$form_stat
   $form['custom_theme']['enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use custom theme on this layout.'),
-    '#default_value' => (is_null($config)) ? FALSE : TRUE,
+    '#default_value' => (empty($config)) ? FALSE : TRUE,
     '#access' => !$layout->isDefault(),
   );
 
@@ -46,7 +46,7 @@ function layout_custom_theme_form_layout_settings_form_alter(&$form, &$form_stat
     '#title' => 'Custom theme',
     '#options' => $options,
     '#empty_option' => '- Select theme -',
-    '#default_value' => (is_null($config)) ? '' : $config,
+    '#default_value' => (empty($config)) ? '' : $config,
     '#states' => array(
       'visible' => array(':input[name="custom_theme[enable]"]' => array('checked' => TRUE)),
       'required' => array(':input[name="custom_theme[enable]"]' => array('checked' => TRUE)),
