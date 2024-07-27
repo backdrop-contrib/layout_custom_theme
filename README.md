@@ -52,7 +52,7 @@ new/additional maintainers.
 -->
 
 - [Martin Price](https://github.com/yorkshire-pudding) - [System Horizons Ltd](https://www.systemhorizons.co.uk)
-- Collaboration and co-maintainers welcome!
+- Collaboration welcome!
 
 Credits
 -------
